@@ -10,9 +10,9 @@ services:
       - saleor-backend-tier
     stdin_open: true
     tty: true
-    # depends_on:
+    depends_on:
     #   - db
-    #   - redis
+      - redis
     #   - jaeger
     volumes:
       # shared volume between worker and api for media
@@ -45,15 +45,15 @@ services:
   #     - POSTGRES_USER=saleor
   #     - POSTGRES_PASSWORD=saleor
 
-  # redis:
-  #   image: library/redis:5.0-alpine
-  #   ports:
-  #     - 6379:6379
-  #   restart: unless-stopped
-  #   networks:
-  #     - saleor-backend-tier
-  #   volumes:
-  #     - saleor-redis:/data
+  redis:
+    image: library/redis:5.0-alpine
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    networks:
+      - saleor-backend-tier
+    volumes:
+      - saleor-redis:/data
 
   worker:
     image: ghcr.io/saleor/saleor:3.11.5
@@ -64,8 +64,8 @@ services:
     env_file:
       - common.env
       - backend.env
-    # depends_on:
-    #   - redis
+    depends_on:
+      - redis
     #   - mailhog
     volumes:
       # shared volume between worker and api for media
@@ -97,8 +97,8 @@ services:
 volumes:
   # saleor-db:
   #   driver: local
-  # saleor-redis:
-  #   driver: local
+  saleor-redis:
+    driver: local
   saleor-media:
 
 networks:
